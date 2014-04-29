@@ -1,9 +1,7 @@
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.Trigger;
+import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 
+import static org.quartz.CronScheduleBuilder.*;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -26,6 +24,8 @@ import static org.quartz.TriggerBuilder.newTrigger;
  * Date: 26.04.14.
  */
 public class Main {
+    /*More information at http://quartz-scheduler.org/documentation/quartz-2.2.x/tutorials/*/
+
     public static void main(String[] args) {
         try {
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -45,7 +45,7 @@ public class Main {
                     .startNow()
                     .withSchedule(
                             simpleSchedule()
-                                    .withIntervalInMilliseconds(1000)
+                                    .withIntervalInMilliseconds(1000) // with interval ms / sec / hours
                                     .repeatForever()
                     )
                     .build();
@@ -54,15 +54,21 @@ public class Main {
                     .withIdentity("trigger2", "group2")
                     .startNow()
                     .withSchedule(
-                            simpleSchedule()
-                                    .withIntervalInMilliseconds(5000)
-                                    .repeatForever()
+                            dailyAtHourAndMinute(11, 30) // weekly / monthly / on given day of week
+                    )
+                    .build();
+
+            // Cron date format
+            Trigger triggerCron = newTrigger()
+                    .withIdentity("trigger3", "group3")
+                    .startNow()
+                    .withSchedule(
+                            cronSchedule("cron sxpression")
                     )
                     .build();
 
             scheduler.scheduleJob(jobFirst, triggerFirst);
             scheduler.scheduleJob(jobSecond, triggerSecond);
-
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
